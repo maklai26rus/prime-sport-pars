@@ -25,6 +25,7 @@ def get_date(URL):
     pothic = 0
     session = requests.Session()
     list_pages = []
+
     for url in URL:
         post_r = session.post(url=url, auth=(
             password.login(), password.pas()), headers=headers)

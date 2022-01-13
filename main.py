@@ -18,9 +18,6 @@ headers = {
     'accept': '*/*'}
 
 
-# N = 0
-
-
 def get_date(URL):
     n = 0
     pothic = 0
@@ -44,14 +41,12 @@ def get_date(URL):
             else:
                 k = [v.text.replace("\n", '').strip().replace("  ", '') for v in i.find_all('td')]
                 h = k[1].replace(",", ' ')
-                line_data = f'{k[3]},{h},{k[2]},{k[10]},{k[13]}'
-                # ws[f'A{n + 1}'] = k[3]
                 ws[f'A{enum + 1 + n}'] = k[3]
                 ws[f'B{enum + 1 + n}'] = h
                 ws[f'C{enum + 1 + n}'] = k[2]
                 ws[f'D{enum + 1 + n}'] = k[10]
                 ws[f'E{enum + 1 + n}'] = k[13]
-                pothic = enum + 1 + n
+                pothic = enum
         n += pothic
         WD.save('text.xlsx')
 

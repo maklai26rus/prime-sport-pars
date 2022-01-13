@@ -1,10 +1,12 @@
+import time
+
 from bs4 import BeautifulSoup
 from openpyxl import Workbook
 import requests
 import password
 
-# url = 'https://prime-sport.ru/'
 URL = []
+
 with open('url_categoria', 'r') as ff:
     for line in ff:
         URL.append(line.replace('\n', ''))
@@ -22,10 +24,28 @@ def get_date(URL):
     n = 0
     pothic = 0
     session = requests.Session()
+    list_pages = []
     for url in URL:
-        print(n, url)
         post_r = session.post(url=url, auth=(
             password.login(), password.pas()), headers=headers)
+
+        soup = BeautifulSoup(post_r.text, "lxml")
+
+        page = soup.find('div', class_='page_nav').find_all('a')
+        try:
+            max_pages_url = page[-1].get('href').split('=')[-1]
+            for np in max_pages_url:
+                MAX_PAGE_URL = f'?AVILIBILLITY=Y&PAGEN_1={np}'
+                _str_urls = url + MAX_PAGE_URL
+                list_pages.append(_str_urls)
+        except AttributeError:
+            list_pages.append(url)
+            continue
+
+    for url in list_pages:
+        post_r = session.post(url=url, auth=(
+            password.login(), password.pas()), headers=headers)
+
         soup = BeautifulSoup(post_r.text, "lxml")
 
         _items = soup.find_all("table", class_="list_items_table")
@@ -48,15 +68,16 @@ def get_date(URL):
                 ws[f'E{enum + 1 + n}'] = k[13]
                 pothic = enum
         n += pothic
-        WD.save('text.xlsx')
+        WD.save('text2.xlsx')
+    list_pages.clear()
 
 
 def main():
-    # tic = time.perf_counter()
+    tic = time.perf_counter()
     get_date(URL)
     # asyncio.run(gather_data())
-    # toc = time.perf_counter()
-    # print(f"Вычисление заняло {toc - tic:0.4f} секунд")
+    toc = time.perf_counter()
+    print(f"Вычисление заняло {toc - tic:0.4f} секунд")
 
 
 if __name__ == "__main__":
